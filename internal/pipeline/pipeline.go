@@ -3,10 +3,10 @@ package pipeline
 import (
 	"fmt"
 	"log"
+	"os"
 	"os/exec"
 	"time"
 )
-
 type Step struct {
 	Name    string
 	Command string
@@ -17,13 +17,12 @@ func RunPipeline(repo string) {
 
 	// 🟢 version unique
 	version := fmt.Sprintf("v%d", time.Now().Unix())
-
+	token := os.Getenv("GITHUB_TOKEN")
 	imageName := "nourhenhachem/innodeploy-app:" + version
 
 	steps := []Step{
 		{"Cleanup", "rm -rf project"},
 		{"Clone", "git clone " + repo + " project"},
-
 		// build
 		{"Build Docker Image", "cd project && docker build -t innodeploy-app ."},
 
@@ -38,7 +37,10 @@ func RunPipeline(repo string) {
 			"sed -i 's|image:.*|image: %s|' k8s/deployment.yaml",
 			imageName,
 		)},
-
+		{
+ 		 "Set Git Remote",
+ 		 fmt.Sprintf("git remote set-url origin https://%s@github.com/hachemn/innodeploy-pfe.git", token),
+		},
 		// push git
 		{"Git Commit", fmt.Sprintf(
 			"git add . && git commit -m 'deploy %s'",
