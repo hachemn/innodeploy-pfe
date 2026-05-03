@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
       - name: app
-        image: nourhenhachem/innodeploy-app:v1777811458
+        image: nourhenhachem/innodeploy-app:v1777816754
         ports:
         - containerPort: 3000
